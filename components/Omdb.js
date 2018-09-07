@@ -1,15 +1,19 @@
 import React from 'react';
-import {Text, TextInput, View} from 'react-native';
-import { HttpService } from "../shared/HttpService";
+import { Text, TextInput, StyleSheet } from 'react-native';
 import { SearchResults } from "./SearchResults";
-const API_KEY = '9bbc72f7';
+import { HttpService } from "./HttpService";
+import { AppHeader } from "./AppHeader";
 
-class RightPage extends React.Component {
+const styles = StyleSheet.create({
+  textInput: { width: '80%', height: 40}
+});
+
+class Omdb extends React.Component {
 
   constructor(props) {
     super(props);
     this.httpService = new HttpService();
-    this.state = { searchText: '', searchResults: [], total: 0, searching: false }
+    this.state = { searchText: '', searchResults: [], total: 0, searching: false };
   };
 
   updateSearchText = (text) => {
@@ -18,8 +22,7 @@ class RightPage extends React.Component {
 
   search = () => {
     this.setState({searching: true});
-    this.httpService
-      .request({ url: 'http://www.omdbapi.com',  params: { s: this.state.searchText, apikey: '9bbc72f7'} })
+    this.httpService.findInServer(this.state.searchText)
       .then((response) => {
         this.setState({searchResults: response.data.Search || [], total: Number(response.data.totalResults), searching: false});
       })
@@ -31,18 +34,17 @@ class RightPage extends React.Component {
   render() {
     const { searchText, searchResults, total, searching } = this.state;
     return <React.Fragment>
-      <View style={{backgroundColor: 'powderblue', marginTop: 24, height: 80, paddingTop:5, paddingBottom: 5, alignItems: 'center', justifyContent: 'center'}}>
+      <AppHeader>
         <TextInput placeholder={'Search'}
-                   style={{ width: '80%', height: 40}}
+                   style={styles.textInput}
                    onChangeText={this.updateSearchText}
                    value={searchText}
-                   onSubmitEditing={this.search}
-        />
-      </View>
+                   onSubmitEditing={this.search} />
+      </AppHeader>
       { searching ? <Text>Buscando</Text> : <SearchResults results={searchResults} total={total} /> }
     </React.Fragment>;
   }
 }
 
-export {RightPage}
+export {Omdb}
 
